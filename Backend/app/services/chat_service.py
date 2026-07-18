@@ -436,9 +436,8 @@ class ChatService:
                 sources=[],
             )
 
-        # Format RAG context from relevant documents
-        candidate_documents = [doc for doc, _ in relevant_documents]
-        documents = self._validate_relevant_documents(message, candidate_documents)
+        # Format RAG context from relevant documents (top 2 to optimize LLM latency)
+        documents = [doc for doc, _ in relevant_documents][:2]
 
         if not documents:
             prompt = self._build_prompt_with_context(message, rag_context=None)
