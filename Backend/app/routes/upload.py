@@ -34,7 +34,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     rag_service.process_document(destination)
 
     return UploadResponse(
-        filename=destination_name,
-        message="PDF uploaded successfully."
-    )
-    
+    filename=destination_name,
+    original_filename=original_name,
+    message="PDF uploaded successfully."
+)
