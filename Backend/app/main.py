@@ -23,7 +23,7 @@ async def versions():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://travel-ai-assistanat-yprt.vercel.app"],
+    allow_origin_regex=r"https://travel-ai-assistanat-.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
