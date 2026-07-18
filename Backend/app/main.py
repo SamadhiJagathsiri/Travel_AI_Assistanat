@@ -15,11 +15,18 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://travel-ai-assistanat-five.vercel.app"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://travel-ai-assistanat-yprt.vercel.app",
+        "https://travel-ai-assistanat-five.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+)git add .
+git commit -m "Fix CORS for Vercel"
+git push
 
 
 @app.get("/")
