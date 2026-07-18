@@ -59,6 +59,7 @@ export default function ChatInput({
       });
 
       const originalName = response.data.original_filename || file.name;
+      onDocumentsChange([...documents, originalName]);
       setIsError(false);
       setFeedbackMessage(
         `📄 ${originalName} uploaded successfully.\n\nGlobeGuide AI will use it only when it is relevant.`
