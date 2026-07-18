@@ -479,5 +479,104 @@ class ChatService:
     def generate_response(self, message: str) -> ChatPayload:
         return self.chat(message)
 
+    def chat_stream(self, message: str):
+        if not message.strip():
+            raise ValueError("Message cannot be empty.")
+
+        intent = self._classify_intent(message)
+
+        # Handle social intents (greetings, thanks, etc.)
+        if intent in {"greeting", "thanks", "goodbye", "help"}:
+            response = self._handle_social_response(intent)
+            self._add_to_history("user", message)
+            self._add_to_history("assistant", response.answer)
+            
+            yield json.dumps({"type": "sources", "sources": []}) + "\n"
+            yield json.dumps({"type": "text", "text": response.answer}) + "\n"
+            return
+
+        retrieval_results = []
+
+        if rag_service.has_documents():
+            try:
+                retrieval_query = self._build_retrieval_query(message)
+                retrieval_results = rag_service.retrieve_with_scores(
+                    retrieval_query,
+                    top_k=self.RETRIEVAL_TOP_K,
+                )
+            except ValueError:
+                retrieval_results = []
+
+        if not retrieval_results:
+            yield json.dumps({"type": "sources", "sources": []}) + "\n"
+            prompt = self._build_prompt_with_context(message, rag_context=None)
+            
+            full_answer = ""
+            for chunk in llm_service.generate_response_stream(prompt):
+                full_answer += chunk
+                yield json.dumps({"type": "text", "text": chunk}) + "\n"
+            
+            self._add_to_history("user", message)
+            self._add_to_history("assistant", full_answer)
+            return
+
+        # Filter documents by similarity threshold
+        relevant_documents = [
+            (doc, score)
+            for doc, score in retrieval_results
+            if score >= self.SIMILARITY_THRESHOLD
+        ]
+
+        if not relevant_documents:
+            yield json.dumps({"type": "sources", "sources": []}) + "\n"
+            prompt = self._build_prompt_with_context(message, rag_context=None)
+            
+            full_answer = ""
+            for chunk in llm_service.generate_response_stream(prompt):
+                full_answer += chunk
+                yield json.dumps({"type": "text", "text": chunk}) + "\n"
+            
+            self._add_to_history("user", message)
+            self._add_to_history("assistant", full_answer)
+            return
+
+        # Format RAG context from relevant documents (top 2 to optimize LLM latency)
+        documents = [doc for doc, _ in relevant_documents][:2]
+
+        if not documents:
+            yield json.dumps({"type": "sources", "sources": []}) + "\n"
+            prompt = self._build_prompt_with_context(message, rag_context=None)
+            
+            full_answer = ""
+            for chunk in llm_service.generate_response_stream(prompt):
+                full_answer += chunk
+                yield json.dumps({"type": "text", "text": chunk}) + "\n"
+
+            self._add_to_history("user", message)
+            self._add_to_history("assistant", full_answer)
+            return
+
+        rag_context = self._format_document_context(documents)
+
+        if not rag_context:
+            raise ValueError("Retrieved document chunks were empty.")
+
+        # Yield sources references
+        sources_payload = [
+            src.model_dump()
+            for src in self._build_sources(documents)
+        ]
+        yield json.dumps({"type": "sources", "sources": sources_payload}) + "\n"
+
+        prompt = self._build_prompt_with_context(message, rag_context=rag_context)
+        
+        full_answer = ""
+        for chunk in llm_service.generate_response_stream(prompt):
+            full_answer += chunk
+            yield json.dumps({"type": "text", "text": chunk}) + "\n"
+
+        self._add_to_history("user", message)
+        self._add_to_history("assistant", full_answer)
+
 
 chat_service = ChatService()

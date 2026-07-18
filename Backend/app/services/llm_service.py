@@ -26,5 +26,20 @@ class LLMService:
         except Exception as e:
             raise RuntimeError(f"Cohere API Error: {e}")
 
+    def generate_response_stream(self, prompt: str):
+        try:
+            response = self.client.chat_stream(
+                model=settings.COHERE_MODEL,
+                message=prompt,
+                temperature=0.2,
+                max_tokens=self.MAX_RESPONSE_TOKENS,
+            )
+            for event in response:
+                if event.event_type == "text-generation":
+                    yield event.text
+
+        except Exception as e:
+            raise RuntimeError(f"Cohere API Error: {e}")
+
 
 llm_service = LLMService()
