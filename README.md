@@ -245,32 +245,6 @@ This prevents unrelated travel guides from influencing responses.
 
 ---
 
-# 📸 Screenshots
-
-## Welcome Screen
-
-> *(Add screenshot here)*
-
----
-
-## Chat Interface
-
-> *(Add screenshot here)*
-
----
-
-## PDF Upload
-
-> *(Add screenshot here)*
-
----
-
-## RAG Response
-
-> *(Add screenshot here)*
-
----
-
 # 🔍 Key Features
 
 ### General Travel Knowledge
