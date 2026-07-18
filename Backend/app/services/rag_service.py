@@ -102,6 +102,10 @@ class RAGService:
         with open(vector_store / "metadata.pkl", "wb") as f:
             pickle.dump(documents, f)
 
+        # Invalidate local cache to force reload on next query
+        self.index = None
+        self.documents = None
+
         logger.info(f"Saved {len(documents)} documents.")
 
     def has_documents(self) -> bool:
@@ -148,6 +152,9 @@ class RAGService:
         return documents
 
     def load_vector_store(self) -> Tuple[faiss.IndexFlatIP, List[Document]]:
+        if self.index is not None and self.documents is not None:
+            return self.index, self.documents
+
         index_path = self.vector_store_path / "faiss.index"
         metadata_path = self.vector_store_path / "metadata.pkl"
 

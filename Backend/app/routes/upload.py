@@ -4,7 +4,7 @@ import shutil
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from app.models.schemas import UploadResponse
+from app.models.schemas import UploadResponse, UploadedDocumentsResponse
 from app.services.rag_service import rag_service
 
 router = APIRouter(
@@ -30,11 +30,16 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     with destination.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    print("UPLOAD ROUTE VERSION 2")
     rag_service.process_document(destination)
 
     return UploadResponse(
-    filename=destination_name,
-    original_filename=original_name,
-    message="PDF uploaded successfully."
-)
+        filename=destination_name,
+        original_filename=original_name,
+        message="PDF uploaded successfully."
+    )
+
+
+@router.get("/documents", response_model=UploadedDocumentsResponse)
+async def get_uploaded_documents():
+    docs = rag_service.list_uploaded_sources()
+    return UploadedDocumentsResponse(documents=docs)
