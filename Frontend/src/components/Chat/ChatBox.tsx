@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import ChatInput from "./ChatInput";
 import ChatWindow from "./ChatWindow";
-import { sendMessage } from "../../services/api";
+import { sendMessageStream } from "../../services/api";
 import type { SourceReference } from "../../types/chat";
 
 type Message = {
@@ -65,46 +65,6 @@ export default function ChatBox({
     );
   }
 
-  async function streamAssistantResponse(messageId: string, fullText: string, sources: SourceReference[] = []) {
-    if (!fullText) {
-      updateAssistantMessage(messageId, {
-        text: "I couldn't generate a response right now.",
-        isLoading: false,
-        isStreaming: false,
-        sources,
-      });
-      return;
-    }
-
-    const chunkSize = 22;
-    let index = 0;
-
-    await new Promise<void>((resolve) => {
-      const intervalId = window.setInterval(() => {
-        index = Math.min(index + chunkSize, fullText.length);
-        const partialText = fullText.slice(0, index);
-
-        updateAssistantMessage(messageId, {
-          text: partialText,
-          isLoading: true,
-          isStreaming: true,
-          sources,
-        });
-
-        if (index >= fullText.length) {
-          window.clearInterval(intervalId);
-          updateAssistantMessage(messageId, {
-            text: fullText,
-            isLoading: false,
-            isStreaming: false,
-            sources,
-          });
-          resolve();
-        }
-      }, 20);
-    });
-  }
-
   async function handleSend(message: string, options?: { replaceMessageId?: string }) {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || isLoading) return;
@@ -141,13 +101,29 @@ export default function ChatBox({
     setIsLoading(true);
 
     try {
-      const assistantResponse = await sendMessage(trimmedMessage);
-
-      await streamAssistantResponse(
-        assistantMessageId,
-        assistantResponse.answer,
-        assistantResponse.sources ?? []
+      let accumulatedText = "";
+      await sendMessageStream(
+        trimmedMessage,
+        (chunk) => {
+          accumulatedText += chunk;
+          updateAssistantMessage(assistantMessageId, {
+            text: accumulatedText,
+            isLoading: true,
+            isStreaming: true,
+          });
+        },
+        (sources) => {
+          updateAssistantMessage(assistantMessageId, {
+            sources,
+          });
+        }
       );
+
+      updateAssistantMessage(assistantMessageId, {
+        text: accumulatedText || "I couldn't generate a response right now.",
+        isLoading: false,
+        isStreaming: false,
+      });
     } catch (error) {
       console.error("Error sending chat message:", error);
 
