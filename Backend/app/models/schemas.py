@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 
 class ChatRequest(BaseModel):
     message: str
+    active_doc_names: list[str] | None = None
 
 
 class SourceReference(BaseModel):

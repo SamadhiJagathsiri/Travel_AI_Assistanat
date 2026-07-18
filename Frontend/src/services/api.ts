@@ -11,9 +11,10 @@ export type ChatResponse = {
   response: ChatMessageModel;
 };
 
-export async function sendMessage(message: string): Promise<ChatMessageModel> {
+export async function sendMessage(message: string, activeDocNames: string[] = []): Promise<ChatMessageModel> {
   const { data } = await api.post<ChatResponse>("/chat", {
     message,
+    active_doc_names: activeDocNames,
   });
   return data.response;
 }
@@ -25,6 +26,7 @@ export async function getUploadedDocuments(): Promise<string[]> {
 
 export async function sendMessageStream(
   message: string,
+  activeDocNames: string[],
   onChunk: (text: string) => void,
   onSources: (sources: SourceReference[]) => void
 ): Promise<void> {
@@ -33,7 +35,7 @@ export async function sendMessageStream(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, active_doc_names: activeDocNames }),
   });
 
   if (!response.ok) {

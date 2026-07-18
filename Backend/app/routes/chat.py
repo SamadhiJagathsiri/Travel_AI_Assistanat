@@ -19,7 +19,7 @@ router = APIRouter(
 async def chat(request: ChatRequest):
 
     try:
-        answer = chat_service.chat(request.message)
+        answer = chat_service.chat(request.message, request.active_doc_names)
 
         return ChatResponse(
             response=answer
@@ -44,7 +44,7 @@ async def chat(request: ChatRequest):
 async def chat_stream(request: ChatRequest):
 
     try:
-        generator = chat_service.chat_stream(request.message)
+        generator = chat_service.chat_stream(request.message, request.active_doc_names)
         return StreamingResponse(generator, media_type="text/event-stream")
 
     except ValueError as e:

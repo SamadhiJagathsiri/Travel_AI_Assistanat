@@ -104,6 +104,7 @@ export default function ChatBox({
       let accumulatedText = "";
       await sendMessageStream(
         trimmedMessage,
+        documents,
         (chunk) => {
           accumulatedText += chunk;
           updateAssistantMessage(assistantMessageId, {

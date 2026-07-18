@@ -371,7 +371,7 @@ class ChatService:
             + " ".join(tips[:3])
         )
 
-    def chat(self, message: str) -> ChatPayload:
+    def chat(self, message: str, active_doc_names: list[str] | None = None) -> ChatPayload:
         if not message.strip():
             raise ValueError("Message cannot be empty.")
 
@@ -387,13 +387,18 @@ class ChatService:
 
         retrieval_results = []
 
-        if rag_service.has_documents():
+        if active_doc_names and rag_service.has_documents():
             try:
                 retrieval_query = self._build_retrieval_query(message)
-                retrieval_results = rag_service.retrieve_with_scores(
+                all_results = rag_service.retrieve_with_scores(
                     retrieval_query,
                     top_k=self.RETRIEVAL_TOP_K,
                 )
+                retrieval_results = [
+                    (doc, score)
+                    for doc, score in all_results
+                    if doc.metadata and doc.metadata.get("source") in active_doc_names
+                ]
             except ValueError:
                 retrieval_results = []
 
@@ -476,10 +481,10 @@ class ChatService:
             sources=self._build_sources(documents),
         )
 
-    def generate_response(self, message: str) -> ChatPayload:
-        return self.chat(message)
+    def generate_response(self, message: str, active_doc_names: list[str] | None = None) -> ChatPayload:
+        return self.chat(message, active_doc_names)
 
-    def chat_stream(self, message: str):
+    def chat_stream(self, message: str, active_doc_names: list[str] | None = None):
         if not message.strip():
             raise ValueError("Message cannot be empty.")
 
@@ -497,13 +502,18 @@ class ChatService:
 
         retrieval_results = []
 
-        if rag_service.has_documents():
+        if active_doc_names and rag_service.has_documents():
             try:
                 retrieval_query = self._build_retrieval_query(message)
-                retrieval_results = rag_service.retrieve_with_scores(
+                all_results = rag_service.retrieve_with_scores(
                     retrieval_query,
                     top_k=self.RETRIEVAL_TOP_K,
                 )
+                retrieval_results = [
+                    (doc, score)
+                    for doc, score in all_results
+                    if doc.metadata and doc.metadata.get("source") in active_doc_names
+                ]
             except ValueError:
                 retrieval_results = []
 
