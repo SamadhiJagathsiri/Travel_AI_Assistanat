@@ -12,7 +12,7 @@ const QUICK_ACTIONS = [
 
 export default function UploadCard({ onPromptSelect }: Props) {
   return (
-    <aside className="h-fit rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-xl shadow-slate-200/70 lg:sticky lg:top-6">
+    <aside className="h-fit rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl shadow-slate-200/70 lg:sticky lg:top-6">
       <h3 className="text-sm font-bold text-slate-950">Quick Actions</h3>
       <div className="mt-3 space-y-2">
         {QUICK_ACTIONS.map((action) => (

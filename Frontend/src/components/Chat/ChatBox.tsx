@@ -175,7 +175,7 @@ export default function ChatBox({
   }
 
   return (
-    <section className="flex min-h-[720px] flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-xl shadow-slate-200/70">
+    <section className="flex min-h-180 flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-xl shadow-slate-200/70">
       <ChatWindow
         messages={messages}
         onRegenerate={handleRegenerate}

@@ -2,7 +2,7 @@ import AssistantAvatar from "../common/AssistantAvatar";
 
 function TravelIllustration() {
   return (
-    <div className="relative hidden h-28 w-56 overflow-hidden rounded-[24px] border border-white/50 bg-white/70 shadow-lg shadow-blue-900/5 backdrop-blur md:block shrink-0">
+    <div className="relative hidden h-28 w-56 overflow-hidden rounded-3xl border border-white/50 bg-white/70 shadow-lg shadow-blue-900/5 backdrop-blur md:block shrink-0">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(20,184,166,0.18),transparent_32%),radial-gradient(circle_at_90%_30%,rgba(37,99,235,0.15),transparent_28%)]" />
       <svg viewBox="0 0 320 160" className="absolute inset-0 h-full w-full" role="img" aria-label="Travel map illustration">
         <path
