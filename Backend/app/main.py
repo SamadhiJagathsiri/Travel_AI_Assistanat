@@ -14,13 +14,6 @@ app = FastAPI(
     description="AI-powered Travel Assistant"
 )
 
-@app.get("/versions")
-async def versions():
-    return {
-        "fastapi": fastapi.__version__,
-        "starlette": starlette.__version__,
-    }
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
