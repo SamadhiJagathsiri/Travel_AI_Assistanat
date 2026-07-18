@@ -31,11 +31,9 @@ async def upload_pdf(file: UploadFile = File(...)):
     with destination.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    documents, embeddings = rag_service.process_document(destination)
-
-    
+    rag_service.process_document(destination)
 
     return UploadResponse(
         filename=destination_name,
         message="PDF uploaded successfully."
-    )    
+    )
