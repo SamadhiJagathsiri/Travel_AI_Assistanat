@@ -4,7 +4,7 @@ from app.config import settings
 
 
 class LLMService:
-    MAX_RESPONSE_TOKENS = 700
+    MAX_RESPONSE_TOKENS = 350
 
     def __init__(self):
         if not settings.COHERE_API_KEY:
