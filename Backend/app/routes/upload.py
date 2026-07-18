@@ -30,10 +30,11 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     with destination.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-
+    print("UPLOAD ROUTE VERSION 2")
     rag_service.process_document(destination)
 
     return UploadResponse(
         filename=destination_name,
         message="PDF uploaded successfully."
     )
+    
