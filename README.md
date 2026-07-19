@@ -17,7 +17,7 @@ The assistant combines **general travel knowledge** with **uploaded PDF travel g
 - 📚 Conversation memory
 - 📎 Upload PDFs directly from the chat input
 - 📄 Automatic source attribution when uploaded guides are used
-- 🎨 Modern responsive UI inspired by ChatGPT/Gemini
+- 🎨 Modern responsive UI inspired by ChatGPT
 - ⚡ Fast local embedding model loading
 - 📱 Responsive design for desktop and mobile
 
